@@ -9,7 +9,7 @@ desde la terminal como ejercicio de "building in public" y aprendizaje de IA apl
 
 - **Web en vivo:** https://davidrochg.github.io/health-dashboard/
 - **Repositorio:** https://github.com/davidrochg/health-dashboard
-- **Estado:** MVP funcionando y actualizándose solo cada día.
+- **Estado:** MVP funcionando, con **Home + pestañas** (Home resumen · Peso detalle) y actualizándose solo cada día.
 
 ---
 
@@ -23,6 +23,11 @@ Muestra: peso de hoy, variación vs. ayer y vs. el mismo día de la semana pasad
 media de la semana natural (lunes-domingo) frente a la anterior, gráfica de
 tendencia del mes y mín/media/máx.
 
+**Navegación por pestañas** (barra inferior, estilo WHOOP): **Home** — lo primero
+que se ve, resumen con la **media semanal** como KPI protagonista — y **Peso** — el
+detalle: media semanal arriba, peso de hoy en segundo plano con sus variaciones,
+gráfica del mes y mín/media/máx. Se irán sumando pestañas (Deporte, etc.).
+
 ---
 
 ## Cómo funciona (3 piezas)
@@ -33,7 +38,8 @@ tendencia del mes y mín/media/máx.
 
 2. **Dashboard** — `index.html`
    Página autocontenida (HTML/CSS/JS, sin librerías externas). Lee `data/peso.json`
-   y lo pinta. Responsive, tema oscuro.
+   y lo pinta. Responsive, tema oscuro. Organizado en **vistas/pestañas** (Home + Peso)
+   que se muestran/ocultan con JS dentro de una sola página.
 
 3. **Publicación** — GitHub Pages
    El repo se sirve como web estática. Cada `git push` republica la página.
@@ -128,8 +134,15 @@ Excel personal en Google Drive (cuenta personal), sincronizado en local:
 - [ ] Silenciar el aviso de identidad de git y dejar los commits a nombre de David
       (email noreply de GitHub).
 
-**Medio plazo — más métricas** (cada una: su lector + su tarjeta en el dashboard)
-- [ ] Sueño · Alimentación · Entrenamiento · Piel · Dental (mapeadas a las subcarpetas de `Salud`).
+**Medio plazo — más métricas** (cada una: su lector + su pestaña/KPI)
+- [ ] **Deporte** (pestaña propia + KPI en Home). Métrica: "días activos" de la semana.
+      Definición cerrada: se lee el Excel de entreno (`Salud/Entrenamiento/Entreno 2026.xlsx`,
+      hoja del mes, columnas = semanas). Un día de la rutina cuenta como **activo** si en la
+      columna de esa semana hay **algún valor escrito** en su bloque; un guion `-` o vacío = no.
+      Cuenta cualquier deporte (gimnasio o libre: surf, golf…). Formato **"X/7"**, con el
+      denominador = días ya cerrados (hasta ayer, más hoy solo si ya tiene algo apuntado), para
+      que "hoy" no cuente como fallo por la mañana. Acompañar con una **tira de 7 puntos** (lun→dom).
+- [ ] Sueño · Alimentación · Piel · Dental (mapeadas a las subcarpetas de `Salud`).
 - [ ] Vista histórica multi-mes (hoy el Excel es de un mes; guardar histórico).
 
 **Largo plazo — quitar la dependencia del Mac**
