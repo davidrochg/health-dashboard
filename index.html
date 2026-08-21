@@ -7,12 +7,8 @@
 <meta name="theme-color" content="#0a0c0d">
 <title>Salud</title>
 <style>
-  :root{
-    --bg:#0a0c0d; --surface:#141719; --surface-2:#1b1f22; --line:#242a2e;
-    --ink:#ffffff; --ink-2:#aab2b8; --ink-3:#6c757c;
-    --accent:#25e0ab; --up:#f4a13c; --down:#25e0ab; --radius:20px;
-    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  }
+  :root{--bg:#0a0c0d;--surface:#141719;--surface-2:#1b1f22;--line:#242a2e;--ink:#fff;--ink-2:#aab2b8;--ink-3:#6c757c;
+    --accent:#25e0ab;--up:#f4a13c;--down:#25e0ab;--radius:20px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
   body{max-width:480px;margin:0 auto;padding:22px 18px 96px;min-height:100vh}
@@ -22,15 +18,15 @@
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
   .card + .card{margin-top:14px}
   .viewlabel{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:2px 2px 12px}
+  .lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
   .whero{background:radial-gradient(120% 140% at 100% 0%, #16211f 0%, var(--surface) 55%)}
   .whero .top{display:flex;align-items:flex-start;justify-content:space-between}
-  .whero .lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
   .whero .delta{display:flex;align-items:center;gap:5px;font-size:16px;font-weight:650;white-space:nowrap}
   .whero .delta .arrow{font-size:12px}
   .delta.up{color:var(--up)} .delta.down{color:var(--down)}
   .whero .big{display:flex;align-items:baseline;gap:8px;margin-top:10px}
-  .whero .num{font-size:60px;font-weight:650;line-height:1;letter-spacing:-.02em}
-  .whero .unit{font-size:19px;color:var(--ink-2);font-weight:600}
+  .whero .num{font-size:56px;font-weight:650;line-height:1;letter-spacing:-.02em}
+  .whero .unit{font-size:18px;color:var(--ink-2);font-weight:600}
   .whero .sub{font-size:13px;color:var(--ink-3);margin-top:8px}
   .whero .prev{font-size:12px;color:var(--ink-3);margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
   .whero .prev b{color:var(--ink-2)}
@@ -45,6 +41,30 @@
   .chip .v{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:4px;font-size:15px;font-weight:650;white-space:nowrap}
   .chip .arrow{font-size:11px}
   .v.up{color:var(--up)} .v.down{color:var(--down)}
+  /* deporte */
+  .dep .top{display:flex;align-items:flex-start;justify-content:space-between}
+  .dep .wk{font-size:12px;color:var(--ink-3)}
+  .dep .big{display:flex;align-items:baseline;gap:6px;margin-top:10px}
+  .dep .num{font-size:56px;font-weight:650;line-height:1;letter-spacing:-.02em;color:var(--accent)}
+  .dep .den{font-size:26px;font-weight:650;color:var(--ink-2)}
+  .dep .den .u{font-size:15px;color:var(--ink-3);font-weight:600}
+  .segs{display:flex;gap:6px;margin-top:18px}
+  .seg{flex:1;height:9px;border-radius:5px;background:var(--line)}
+  .seg.active{background:var(--accent)}
+  .seg.rest{background:transparent;border:1px solid var(--line)}
+  .seg.future{background:transparent;border:1px dashed var(--line);opacity:.5}
+  .dep .cap{font-size:12px;color:var(--ink-3);margin-top:12px}
+  .legend{display:flex;gap:14px;margin-top:12px;font-size:11px;color:var(--ink-3)}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dt{width:9px;height:9px;border-radius:3px;display:inline-block}
+  .dt.a{background:var(--accent)}.dt.r{border:1px solid var(--line)}.dt.f{border:1px dashed var(--line);opacity:.6}
+  .depc{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .depc .l .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+  .depc .l .v{font-size:30px;font-weight:650;margin-top:3px}
+  .depc .l .v .num{color:var(--accent)} .depc .l .v .den{color:var(--ink-2);font-size:20px}
+  .depc .l .d{font-size:12px;color:var(--ink-3);margin-top:2px}
+  .depc .segs{flex:1;max-width:160px;margin-top:0}
+  /* chart */
   .chart-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
   .chart-head .h{font-size:14px;font-weight:600}
   .chart-head .lg{font-size:12px;color:var(--ink-3)}
@@ -56,16 +76,13 @@
   .stat{flex:1;text-align:center}.stat .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
   .stat .v{font-size:22px;font-weight:650;margin-top:6px;font-variant-numeric:tabular-nums}.stat + .stat{border-left:1px solid var(--line)}
   .hint{color:var(--ink-3);font-size:12px;text-align:center;margin-top:16px;padding:16px;border:1px dashed var(--line);border-radius:14px}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;
-    background:rgba(10,12,13,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);
-    display:flex;padding:8px 12px calc(8px + env(safe-area-inset-bottom));z-index:10}
-  .tab{flex:1;background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;
-    padding:6px 0;color:var(--ink-3);font-family:inherit}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:rgba(10,12,13,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:8px 12px calc(8px + env(safe-area-inset-bottom));z-index:10}
+  .tab{flex:1;background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--ink-3);font-family:inherit}
   .tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
-  .tab .t{font-size:11px;font-weight:600;letter-spacing:.02em}
+  .tab .t{font-size:11px;font-weight:600}
   .tab.active{color:var(--accent)}
   .view{display:none}.view.active{display:block}
-  .err{color:var(--ink-2);text-align:center;padding:40px 20px;font-size:14px}
+  .err{color:var(--ink-2);text-align:center;padding:14px;font-size:13px}
 </style>
 </head>
 <body>
@@ -74,7 +91,7 @@
   <div class="view active" id="view-home">
     <div class="viewlabel">Home</div>
     <div class="card whero" id="home-week"></div>
-    <div class="hint">Aquí irán más KPIs (peso, deporte, sueño…) a medida que sumemos vistas.</div>
+    <div class="card depc" id="home-dep"></div>
   </div>
 
   <div class="view" id="view-peso">
@@ -92,60 +109,51 @@
     </div>
   </div>
 
+  <div class="view" id="view-dep">
+    <div class="viewlabel">Deporte</div>
+    <div class="card dep" id="dep-full"></div>
+  </div>
+
   <nav class="tabbar">
-    <button class="tab active" data-v="home">
-      <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
-      <span class="t">Home</span>
-    </button>
-    <button class="tab" data-v="peso">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-5"/></svg>
-      <span class="t">Peso</span>
-    </button>
+    <button class="tab active" data-v="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span class="t">Home</span></button>
+    <button class="tab" data-v="peso"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-5"/></svg><span class="t">Peso</span></button>
+    <button class="tab" data-v="dep"><svg viewBox="0 0 24 24"><path d="M4 13l4 0 2-6 4 12 2-6 4 0"/></svg><span class="t">Deporte</span></button>
   </nav>
 
 <script>
 const fmt=(n,d=1)=>(n>0?"+":"")+n.toFixed(d);
 const dias=n=>n+' día'+(n===1?'':'s');
 const deltaHTML=(v,dec=1)=>{const dn=v<0;return `<span class="arrow">${dn?'▼':'▲'}</span>${fmt(v,dec)} kg`;};
+const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-// Pestañas (no dependen de los datos)
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
-  document.getElementById('view-'+b.dataset.v).classList.add('active');
-  scrollTo(0,0);
+  const v=document.getElementById('view-'+b.dataset.v); if(v)v.classList.add('active'); scrollTo(0,0);
 }));
 
-fetch('./data/peso.json?v=' + Date.now())
-  .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
-  .then(render)
-  .catch(err => {
-    document.body.innerHTML = '<div class="err">No se pudieron cargar los datos de peso.<br>('+err+')</div>';
-    console.error(err);
-  });
+// ---- PESO ----
+fetch('./data/peso.json?v='+Date.now()).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
+  .then(renderPeso).catch(e=>{document.getElementById('home-week').innerHTML='<div class="err">Sin datos de peso ('+e+')</div>';});
 
-function render(DATA){
-  document.getElementById('month').textContent = DATA.month;
-  if(!DATA.current){ document.getElementById('home-week').innerHTML='<div class="lbl">Sin datos este mes.</div>'; return; }
-
-  // Hero media semanal (Home + Peso)
+function renderPeso(DATA){
+  document.getElementById('month').textContent=DATA.month;
   function weekHero(){
     const w=DATA.week;
-    if(!w || w.this.avg===null) return '<div class="lbl">Media semanal — sin datos suficientes.</div>';
+    if(!w||w.this.avg===null) return '<div class="lbl">Media semanal — sin datos.</div>';
     const cls=w.delta<0?'down':'up';
-    const deltaBlock = (w.delta!==null) ? `<div class="delta ${cls}">${deltaHTML(w.delta,2)}</div>` : '';
-    const prevBlock = (w.last.avg!==null) ? `<div class="prev">semana pasada <b>${w.last.avg.toFixed(2)} kg</b> · ${dias(w.last.count)}</div>` : '';
-    return `<div class="top"><div class="lbl">Media semanal</div>${deltaBlock}</div>
+    const d=(w.delta!==null)?`<div class="delta ${cls}">${deltaHTML(w.delta,2)}</div>`:'';
+    const p=(w.last.avg!==null)?`<div class="prev">semana pasada <b>${w.last.avg.toFixed(2)} kg</b> · ${dias(w.last.count)}</div>`:'';
+    return `<div class="top"><div class="lbl">Media semanal</div>${d}</div>
       <div class="big"><span class="num">${w.this.avg.toFixed(2)}</span><span class="unit">kg</span></div>
-      <div class="sub">esta semana · ${dias(w.this.count)}</div>${prevBlock}`;
+      <div class="sub">esta semana · ${dias(w.this.count)}</div>${p}`;
   }
   document.getElementById('home-week').innerHTML=weekHero();
   document.getElementById('peso-week').innerHTML=weekHero();
-
-  // Hoy (secundario en Peso)
+  if(!DATA.current)return;
   const dp=DATA.delta_vs_previous, dw=DATA.delta_vs_week;
-  const chip=(k,v)=> v===null||v===undefined
+  const chip=(k,v)=> (v===null||v===undefined)
     ? `<div class="chip"><div class="k">${k}</div><div class="v">—</div></div>`
     : `<div class="chip"><div class="k">${k}</div><div class="v ${v<0?'down':'up'}">${deltaHTML(v)}</div></div>`;
   document.getElementById('peso-today').innerHTML=`
@@ -153,13 +161,10 @@ function render(DATA){
       <div class="v">${DATA.current.weight.toFixed(1)}<span class="u">kg</span></div>
       <div class="d">día ${DATA.current.day}</div></div>
     <div class="chips">${chip('vs ayer',dp)}${chip('vs 7 días',dw)}</div>`;
-
   document.getElementById('min').textContent=DATA.stats.min.toFixed(1);
   document.getElementById('avg').textContent=DATA.stats.avg.toFixed(1);
   document.getElementById('max').textContent=DATA.stats.max.toFixed(1);
   document.getElementById('range').textContent='días '+DATA.series[0].day+'–'+DATA.series[DATA.series.length-1].day;
-
-  // Gráfica
   const S=DATA.series,W=440,H=180,padL=30,padR=12,padT=14,padB=24;
   const xs=S.map(p=>p.day),ys=S.map(p=>p.weight);
   const xMin=Math.min(...xs),xMax=Math.max(...xs);
@@ -175,6 +180,34 @@ function render(DATA){
   let gx='';[xMin,Math.round((xMin+xMax)/2),xMax].forEach(dv=>{gx+=`<text x="${X(dv).toFixed(1)}" y="${H-6}" text-anchor="middle" class="tk">${dv}</text>`;});
   const dots=S.map((p,i)=>{const last=i===S.length-1;return `<circle cx="${X(p.day).toFixed(1)}" cy="${Y(p.weight).toFixed(1)}" r="${last?5:3.2}" class="${last?'dot-last':'dot'}"/>`;}).join('');
   document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs><style>.tk{fill:var(--ink-3);font-size:10px}</style><g class="grid">${gy}</g><g>${gx}</g><path class="area" d="${area}"/><path class="trend" d="${line}"/>${dots}</svg>`;
+}
+
+// ---- DEPORTE ----
+fetch('./data/deporte.json?v='+Date.now()).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
+  .then(renderDep).catch(e=>{document.getElementById('home-dep').innerHTML='<div class="err">Sin datos de deporte ('+e+')</div>';document.getElementById('dep-full').innerHTML='<div class="err">Sin datos de deporte ('+e+')</div>';});
+
+function segsHTML(pattern){
+  return '<div class="segs">'+pattern.map(s=>`<div class="seg ${s}"></div>`).join('')+'</div>';
+}
+function semanaLabel(iso){
+  const [y,m,d]=iso.split('-').map(Number);
+  return 'semana del '+d+' '+MESES[m-1];
+}
+function renderDep(D){
+  const a=D.dias_activos, t=D.dias_transcurridos;
+  // Home (compacto)
+  document.getElementById('home-dep').innerHTML=`
+    <div class="l"><div class="k">Días activos</div>
+      <div class="v"><span class="num">${a}</span><span class="den"> / ${t}</span></div>
+      <div class="d">esta semana</div></div>
+    ${segsHTML(D.pattern)}`;
+  // Deporte (completo)
+  document.getElementById('dep-full').innerHTML=`
+    <div class="top"><div class="lbl">Días activos</div><div class="wk">${semanaLabel(D.week_start)}</div></div>
+    <div class="big"><span class="num">${a}</span><span class="den">/ ${t} <span class="u">días</span></span></div>
+    ${segsHTML(D.pattern)}
+    <div class="legend"><span><i class="dt a"></i>activo</span><span><i class="dt r"></i>sin registrar</span><span><i class="dt f"></i>queda semana</span></div>
+    <div class="cap">${a} días activos · van ${t} de ${D.total_semana} de la semana natural (lun–dom)</div>`;
 }
 </script>
 </body>

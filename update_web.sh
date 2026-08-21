@@ -5,8 +5,10 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 cd /Users/davidrochgarcia/health-dashboard || exit 1
 
-# 1) Regenerar data/peso.json desde el Excel
-/usr/bin/python3 scripts/build_data.py || { echo "$(date '+%F %T') ERROR generando datos"; exit 1; }
+# 1) Regenerar los datos desde los Excel
+/usr/bin/python3 scripts/build_data.py || { echo "$(date '+%F %T') ERROR generando peso"; exit 1; }
+# Deporte es no crítico: si falla (p. ej. hoja del mes aún no creada), seguimos igual.
+/usr/bin/python3 scripts/build_deporte.py || echo "$(date '+%F %T') AVISO: deporte no generado"
 
 # 2) ¿Hay cambios? Si no, no hacemos nada.
 git add -A
