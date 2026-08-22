@@ -97,7 +97,7 @@ def main():
     out = sys.argv[2] if len(sys.argv) > 2 else OUTPUT_PATH
     hoy = datetime.now()
 
-    wb = openpyxl.load_workbook(excel, data_only=True, read_only=True)
+    wb = openpyxl.load_workbook(excel, data_only=True)
     ws = elegir_hoja(wb, hoy)
     col, fecha_col = col_semana(ws, hoy)
 
