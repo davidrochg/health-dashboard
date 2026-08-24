@@ -9,6 +9,7 @@ cd /Users/davidrochgarcia/health-dashboard || exit 1
 /usr/bin/python3 scripts/build_data.py || { echo "$(date '+%F %T') ERROR generando peso"; exit 1; }
 # Deporte es no crítico: si falla (p. ej. hoja del mes aún no creada), seguimos igual.
 /usr/bin/python3 scripts/build_deporte.py || echo "$(date '+%F %T') AVISO: deporte no generado"
+/usr/bin/python3 scripts/build_dieta.py || echo "$(date '+%F %T') AVISO: dieta no generada"
 
 # 2) ¿Hay cambios? Si no, no hacemos nada.
 git add -A
