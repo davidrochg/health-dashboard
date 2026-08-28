@@ -18,6 +18,18 @@ if git diff --cached --quiet; then
   exit 0
 fi
 
-# 3) Guardar y subir
+# 3) Guardar el commit
 git commit -m "Actualización automática ($(date '+%F'))"
-git push && echo "$(date '+%F %T') actualizado y publicado" || echo "$(date '+%F %T') ERROR al subir"
+
+# 4) Subir con reintentos (por si al arrancar el WiFi aún no ha conectado).
+#    El commit ya está guardado en local; si hoy no sube, se subirá en la próxima ejecución.
+for intento in 1 2 3 4 5; do
+  if git push; then
+    echo "$(date '+%F %T') actualizado y publicado (intento $intento)"
+    exit 0
+  fi
+  echo "$(date '+%F %T') no se pudo subir (intento $intento), reintento en 60s…"
+  sleep 60
+done
+echo "$(date '+%F %T') ERROR al subir tras 5 intentos (quedará guardado en local y se subirá luego)"
+exit 1
