@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-08-30T09:00:05",
-  "week_start": "2026-08-24",
-  "dias_activos": 7,
-  "dias_transcurridos": 7,
+  "generated_at": "2026-08-31T09:02:38",
+  "week_start": "2026-08-31",
+  "dias_activos": 0,
+  "dias_transcurridos": 1,
   "total_semana": 7,
-  "slots_marcados": 7,
+  "slots_marcados": 0,
   "pattern": [
-    "active",
-    "active",
-    "active",
-    "active",
-    "active",
-    "active",
-    "active"
+    "rest",
+    "future",
+    "future",
+    "future",
+    "future",
+    "future",
+    "future"
   ],
   "sheet": "Entreno Agosto 2026",
-  "week_col_date": "2026-08-24"
+  "week_col_date": "2026-08-31"
 }
