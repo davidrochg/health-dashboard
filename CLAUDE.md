@@ -46,14 +46,26 @@ sumando más pestañas (sueño, alimentación, etc.).
 3. **Publicación** — GitHub Pages
    El repo se sirve como web estática. Cada `git push` republica la página.
 
-### Actualización automática
-- **`update_web.sh`**: regenera `peso.json` y `deporte.json` desde los Excel y hace commit + push. (El deporte es no crítico: si falla, el peso se publica igual.)
-- **LaunchAgent** `~/Library/LaunchAgents/com.davidroch.healthdashboard.plist`:
-  dispara `update_web.sh` **cada día a las 09:00** (hora local del Mac).
-- Logs en `~/Library/Logs/healthdashboard.log` y `...-error.log`.
+### Actualización automática (en la nube)
+- **GitHub Actions** `.github/workflows/update.yml`: dos pasadas al día, **09:00 y 21:00
+  hora de Madrid** (cron a prueba de cambio de hora verano/invierno mediante un "portero"
+  que solo deja pasar esas horas). En cada pasada el robot **descarga los dos Excel
+  directamente de Google Drive** (`scripts/fetch_drive.py`, con una cuenta de servicio),
+  regenera los tres JSON y **publica solo si cambia un dato real** (ignora el cambio de
+  `generated_at`, para no ensuciar el historial).
+- **No depende del Mac**: corre en los servidores de GitHub. Ve al instante lo que se apunte
+  desde el móvil, porque lee la nube y no una copia local del portátil.
+- **Acceso a Drive**: cuenta de servicio
+  `drive-reader@health-dashboard-507211.iam.gserviceaccount.com`, con los dos Excel
+  compartidos en solo-lectura. La llave JSON vive como **Secret de GitHub** (`GDRIVE_SA_KEY`);
+  los IDs de fichero van fijados en el propio workflow. Nada de esto queda en el repo público.
+- **Lanzar a mano**: pestaña **Actions** → "Actualizar dashboard (nube)" → **Run workflow**.
 
-**Para actualizar a mano:** `bash ~/health-dashboard/update_web.sh`
-**Para actualizar sin hacer nada:** apuntar el peso en el Excel; a las 09:00 se publica solo.
+**Histórico (desactivado):** antes se hacía en el Mac con `update_web.sh` + LaunchAgents
+(`com.davidroch.healthdashboard[.push]`, 09:00 hora local). Se jubiló al pasar a la nube; los
+`.plist` quedaron guardados en `_launchagents_desactivados/`. El cambio resolvió el problema de
+fondo: el Mac leía una **copia local** de Drive y las ediciones desde el móvil llegaban tarde
+(o el push fallaba al no haber red al despertar).
 
 ---
 
@@ -181,9 +193,9 @@ Excel personal en Google Drive (cuenta personal), sincronizado en local:
 - [ ] Vista histórica multi-mes (hoy los Excel son de un mes; guardar histórico).
 
 **Largo plazo — quitar la dependencia del Mac**
-- [ ] Automatización **100% en la nube** (p. ej. GitHub Actions programado) leyendo los
-      datos desde una fuente accesible en la nube (Google Sheets / Drive API), de modo que
-      la web se actualice sola aunque el Mac esté apagado.
+- [x] Automatización **100% en la nube** — HECHO. GitHub Actions (2 pasadas: 09:00 y 21:00
+      Madrid) que lee los Excel desde Google Drive con una cuenta de servicio. La web se
+      actualiza sola aunque el Mac esté apagado. Ver "Actualización automática (en la nube)".
 - [ ] Privacidad: si algún día los datos son más sensibles, proteger con contraseña
       (p. ej. Cloudflare Access).
 
