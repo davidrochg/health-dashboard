@@ -2,13 +2,17 @@
 """
 Lee el Excel de peso y genera data/peso.json para el dashboard de salud.
 
-Reglas de lectura de la hoja de peso:
-- Fila 1, col A: nombre del mes (p. ej. "Agosto").
-- Fila 2: cabeceras (Día, Peso, Eat).
-- Fila 3 en adelante: datos. Col A = día del mes, col B = peso (puede estar vacío),
-  col C = marca "Eat" (de momento se ignora).
-- Hay días sin peso (huecos) en medio: NO parar en el primer hueco; recorrer todo.
-- La última fila con un número suelto (sin día) es la media del mes: ignorarla.
+Estructura de la hoja (una sola hoja, meses en BLOQUES de 3 columnas a la derecha):
+- Fila 1: nombre del mes en la primera columna del bloque (celda combinada),
+  p. ej. A1="Agosto" (bloque A-C), D1="Septiembre" (bloque D-F), etc.
+- Fila 2: cabeceras del bloque (Día, Peso, Eat).
+- Fila 3 en adelante: datos. Día = 1..31, Peso puede estar vacío (hueco).
+- La fila de la media del mes (número suelto sin día) se ignora (no tiene día).
+
+El lector une TODOS los bloques en una única serie temporal continua, de modo que
+"ayer", "hace 7 días" y la media semanal funcionan aunque la semana cruce el cambio
+de mes. Las stats y la gráfica ("series") muestran el MES EN CURSO (el del último
+registro). El JSON de salida no cambia de forma.
 """
 
 import json
@@ -19,13 +23,10 @@ from pathlib import Path
 
 import openpyxl
 
-# --- Configuración -------------------------------------------------------
-# Ruta del Excel de peso en el Mac (cámbiala solo si mueves el archivo).
 EXCEL_PATH = (
     "/Users/davidrochgarcia/Library/CloudStorage/"
     "GoogleDrive-davidrochgarcia@gmail.com/My Drive/1. dOS/Salud/Peso.xlsx"
 )
-# Dónde se escribe el JSON (relativo a la raíz del proyecto).
 OUTPUT_PATH = "data/peso.json"
 
 MESES = {
@@ -40,41 +41,57 @@ def _sin_acentos(texto: str) -> str:
     return "".join(c for c in t if not unicodedata.combining(c)).strip().lower()
 
 
+def escanear_bloques(ws):
+    """Detecta los bloques de mes por su cabecera en la fila 1.
+    Devuelve [{mes_num, mes_txt, col_dia, col_peso, col_eat}] en orden de columna."""
+    bloques = []
+    for c in range(1, ws.max_column + 1):
+        v = ws.cell(row=1, column=c).value
+        if not v:
+            continue
+        mn = MESES.get(_sin_acentos(str(v)).split()[0]) if str(v).strip() else None
+        if mn:
+            bloques.append({
+                "mes_num": mn, "mes_txt": str(v).strip(),
+                "col_dia": c, "col_peso": c + 1, "col_eat": c + 2,
+            })
+    return bloques
+
+
 def leer_peso(excel_path: str) -> dict:
     wb = openpyxl.load_workbook(excel_path, data_only=True)
     ws = wb.worksheets[0]
-
-    # Mes (fila 1, col A) -> número de mes.
-    titulo = ws.cell(row=1, column=1).value
-    mes_txt = _sin_acentos(str(titulo)) if titulo else ""
-    mes_num = MESES.get(mes_txt.split()[0]) if mes_txt else None
     anio = datetime.now().year
 
-    registros = []
-    for fila in ws.iter_rows(min_row=3, values_only=True):
-        dia = fila[0] if len(fila) > 0 else None
-        peso = fila[1] if len(fila) > 1 else None
-        # Solo filas con día numérico entre 1 y 31 y con peso numérico.
-        if not isinstance(dia, (int, float)):
-            continue
-        dia = int(dia)
-        if dia < 1 or dia > 31:
-            continue
-        if not isinstance(peso, (int, float)):
-            continue
-        if mes_num:
-            fecha = f"{anio:04d}-{mes_num:02d}-{dia:02d}"
-        else:
-            fecha = None
-        registros.append({"date": fecha, "day": dia, "weight": round(float(peso), 1)})
+    bloques = escanear_bloques(ws)
+    # Compatibilidad: si no se detecta ningún bloque, asumimos el clásico A/B con mes en A1.
+    if not bloques:
+        titulo = ws.cell(row=1, column=1).value
+        mn = MESES.get(_sin_acentos(str(titulo)).split()[0]) if titulo else None
+        bloques = [{"mes_num": mn, "mes_txt": str(titulo).strip() if titulo else "",
+                    "col_dia": 1, "col_peso": 2, "col_eat": 3}]
 
-    registros.sort(key=lambda r: r["day"])
-    return {
-        "mes_txt": str(titulo).strip() if titulo else "",
-        "mes_num": mes_num,
-        "anio": anio,
-        "registros": registros,
-    }
+    registros = []
+    meses = {}
+    for b in bloques:
+        if b["mes_num"]:
+            meses[b["mes_num"]] = b["mes_txt"]
+        for r in range(3, ws.max_row + 1):
+            dia = ws.cell(row=r, column=b["col_dia"]).value
+            peso = ws.cell(row=r, column=b["col_peso"]).value
+            if not isinstance(dia, (int, float)):
+                continue
+            dia = int(dia)
+            if dia < 1 or dia > 31:
+                continue
+            if not isinstance(peso, (int, float)):
+                continue
+            fecha = f"{anio:04d}-{b['mes_num']:02d}-{dia:02d}" if b["mes_num"] else None
+            registros.append({"date": fecha, "day": dia, "weight": round(float(peso), 1)})
+
+    # Orden cronológico real (por fecha) para tratar los meses como una línea continua.
+    registros.sort(key=lambda r: (r["date"] or ""))
+    return {"registros": registros, "meses": meses, "anio": anio}
 
 
 def dias_entre(fecha_a: str, fecha_b: str) -> int:
@@ -84,25 +101,24 @@ def dias_entre(fecha_a: str, fecha_b: str) -> int:
 
 
 def construir_json(datos: dict) -> dict:
-    regs = datos["registros"]
+    regs = datos["registros"]          # serie CONTINUA (todos los meses), ordenada por fecha
     if not regs:
+        ultimo_mes = max(datos["meses"]) if datos["meses"] else None
+        etiqueta = f'{datos["meses"].get(ultimo_mes, "")} {datos["anio"]}'.strip()
         return {
             "generated_at": datetime.now().isoformat(timespec="seconds"),
             "unit": "kg",
-            "month": f'{datos["mes_txt"]} {datos["anio"]}'.strip(),
+            "month": etiqueta,
             "current": None,
             "series": [],
-            "note": "Sin registros de peso este mes.",
+            "note": "Sin registros de peso.",
         }
 
-    pesos = [r["weight"] for r in regs]
     current = regs[-1]
     previous = regs[-2] if len(regs) >= 2 else None
-
     delta_prev = round(current["weight"] - previous["weight"], 1) if previous else None
 
-    # Variación vs el MISMO día de la semana pasada = exactamente 7 días antes.
-    # null si no hay registro ese día.
+    # Variación vs exactamente 7 días antes (serie continua, cruza meses).
     delta_week = None
     ref_week = None
     if current["date"]:
@@ -112,10 +128,7 @@ def construir_json(datos: dict) -> dict:
                 delta_week = round(current["weight"] - r["weight"], 1)
                 break
 
-    # Medias por SEMANA NATURAL (lunes-domingo):
-    #   - "this": semana en curso, del lunes a hoy (semana a fecha).
-    #   - "last": semana natural anterior completa (lunes a domingo).
-    # Robusto ante huecos: promedia los días que haya en cada rango.
+    # Medias por semana natural (lunes-domingo) sobre la serie continua.
     def media_rango(desde, hasta):
         vals = []
         for r in regs:
@@ -126,23 +139,19 @@ def construir_json(datos: dict) -> dict:
                 vals.append(r["weight"])
         if not vals:
             return {"avg": None, "count": 0, "_sum": 0.0}
-        return {"avg": round(sum(vals) / len(vals), 2), "count": len(vals),
-                "_sum": sum(vals)}
+        return {"avg": round(sum(vals) / len(vals), 2), "count": len(vals), "_sum": sum(vals)}
 
     week = None
     if current["date"]:
         cur_dt = datetime.strptime(current["date"], "%Y-%m-%d")
-        this_start = cur_dt - timedelta(days=cur_dt.weekday())   # lunes de esta semana
+        this_start = cur_dt - timedelta(days=cur_dt.weekday())
         last_start = this_start - timedelta(days=7)
-        last_end = this_start - timedelta(days=1)                # domingo pasado
-
+        last_end = this_start - timedelta(days=1)
         this_w = media_rango(this_start, cur_dt)
         last_w = media_rango(last_start, last_end)
         delta_w = None
         if this_w["avg"] is not None and last_w["avg"] is not None:
-            raw_this = this_w["_sum"] / this_w["count"]
-            raw_last = last_w["_sum"] / last_w["count"]
-            delta_w = round(raw_this - raw_last, 2)
+            delta_w = round(this_w["_sum"] / this_w["count"] - last_w["_sum"] / last_w["count"], 2)
         for w in (this_w, last_w):
             w.pop("_sum", None)
         week = {
@@ -152,10 +161,23 @@ def construir_json(datos: dict) -> dict:
             "last_end": last_end.strftime("%Y-%m-%d"),
         }
 
+    # Stats y gráfica = MES EN CURSO (el del último registro).
+    cur_dt = datetime.strptime(current["date"], "%Y-%m-%d") if current["date"] else None
+    if cur_dt:
+        mes_regs = [r for r in regs if r["date"]
+                    and datetime.strptime(r["date"], "%Y-%m-%d").month == cur_dt.month
+                    and datetime.strptime(r["date"], "%Y-%m-%d").year == cur_dt.year]
+        mes_txt = datos["meses"].get(cur_dt.month, "")
+        month_label = f"{mes_txt} {cur_dt.year}".strip()
+    else:
+        mes_regs = regs
+        month_label = f'{datos["anio"]}'.strip()
+
+    pesos = [r["weight"] for r in mes_regs]
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "unit": "kg",
-        "month": f'{datos["mes_txt"]} {datos["anio"]}'.strip(),
+        "month": month_label,
         "current": current,
         "previous": previous,
         "delta_vs_previous": delta_prev,
@@ -163,12 +185,11 @@ def construir_json(datos: dict) -> dict:
         "reference_week": ref_week,
         "week": week,
         "stats": {
-            "count": len(regs),
-            "min": min(pesos),
-            "max": max(pesos),
+            "count": len(mes_regs),
+            "min": min(pesos), "max": max(pesos),
             "avg": round(sum(pesos) / len(pesos), 1),
         },
-        "series": regs,
+        "series": mes_regs,
     }
 
 
@@ -183,19 +204,22 @@ def main():
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(resultado, f, ensure_ascii=False, indent=2)
 
-    # Resumen legible.
     c = resultado.get("current")
     if c:
         print(f"Mes: {resultado['month']}")
-        print(f"Registros: {resultado['stats']['count']}")
+        print(f"Registros del mes: {resultado['stats']['count']}")
         print(f"Peso actual: {c['weight']} kg (día {c['day']}, {c['date']})")
-        print(f"Variación vs día anterior: {resultado['delta_vs_previous']}")
+        print(f"Variación vs día anterior: {resultado['delta_vs_previous']} "
+              f"(anterior: {resultado['previous']['date'] if resultado['previous'] else None})")
         print(f"Variación vs ~semana: {resultado['delta_vs_week']}")
-        print(f"Media/min/max: {resultado['stats']['avg']} / "
+        if resultado.get("week"):
+            print(f"Media semanal: esta {resultado['week']['this']['avg']} · "
+                  f"pasada {resultado['week']['last']['avg']} · delta {resultado['week']['delta']}")
+        print(f"Media/min/max mes: {resultado['stats']['avg']} / "
               f"{resultado['stats']['min']} / {resultado['stats']['max']}")
     else:
         print("Sin registros.")
-    print(f"\nEscrito: {out_path}")
+    print(f"Escrito: {out_path}")
 
 
 if __name__ == "__main__":

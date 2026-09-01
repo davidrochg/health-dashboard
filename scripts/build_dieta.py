@@ -3,14 +3,16 @@
 Lee la columna "Eat" del Excel de peso y genera data/dieta.json.
 
 Métrica: días que cumplo el plan de alimentación en la semana natural en curso.
-- En la hoja de peso, col A = día del mes, col C = "Eat": "X" = cumplí, "-" = no.
-- OJO (a diferencia de peso/deporte): la dieta solo se sabe al FINAL del día, así
-  que el denominador son los días YA CERRADOS de la semana (lunes → ayer). "Hoy"
-  no cuenta hasta que termina.
+- En cada bloque de mes: Día (1..31) y "Eat": "X" = cumplí, "-"/vacío = no.
+- La dieta se sabe al FINAL del día, así que el denominador son los días YA CERRADOS
+  de la semana (lunes → ayer). "Hoy" no cuenta hasta que termina.
+- Lee TODOS los bloques de mes, así que la semana que cruza el cambio de mes
+  (p. ej. lun 31-ago → dom 6-sep) se cuenta bien uniendo agosto y septiembre.
 """
 
 import json
 import sys
+import unicodedata
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -29,21 +31,44 @@ MESES = {
 }
 
 
+def _sin_acentos(texto: str) -> str:
+    t = unicodedata.normalize("NFKD", texto)
+    return "".join(c for c in t if not unicodedata.combining(c)).strip().lower()
+
+
 def cumple(v):
     return v is not None and str(v).strip().upper() == "X"
 
 
-def leer_eat(ws):
-    """Mapa {día_del_mes: valor Eat} y número de mes de la hoja."""
-    titulo = str(ws.cell(1, 1).value or "").strip().lower()
-    mes_num = MESES.get(titulo.split()[0]) if titulo else None
-    data = {}
-    for r in range(3, 40):
-        d = ws.cell(r, 1).value
-        e = ws.cell(r, 3).value
-        if isinstance(d, (int, float)):
-            data[int(d)] = e
-    return data, mes_num
+def escanear_bloques(ws):
+    bloques = []
+    for c in range(1, ws.max_column + 1):
+        v = ws.cell(row=1, column=c).value
+        if not v:
+            continue
+        mn = MESES.get(_sin_acentos(str(v)).split()[0]) if str(v).strip() else None
+        if mn:
+            bloques.append({"mes_num": mn, "col_dia": c, "col_eat": c + 2})
+    return bloques
+
+
+def leer_eat_mapa(ws):
+    """Mapa {(mes_num, día): valor Eat} recorriendo todos los bloques de mes."""
+    bloques = escanear_bloques(ws)
+    if not bloques:  # compatibilidad con el formato clásico A/C
+        titulo = ws.cell(1, 1).value
+        mn = MESES.get(_sin_acentos(str(titulo)).split()[0]) if titulo else None
+        bloques = [{"mes_num": mn, "col_dia": 1, "col_eat": 3}]
+    mapa = {}
+    for b in bloques:
+        if not b["mes_num"]:
+            continue
+        for r in range(3, ws.max_row + 1):
+            d = ws.cell(row=r, column=b["col_dia"]).value
+            e = ws.cell(row=r, column=b["col_eat"]).value
+            if isinstance(d, (int, float)):
+                mapa[(b["mes_num"], int(d))] = e
+    return mapa
 
 
 def main():
@@ -53,48 +78,42 @@ def main():
 
     wb = openpyxl.load_workbook(excel, data_only=True)
     ws = wb.worksheets[0]
-    data, mes_num = leer_eat(ws)
-    anio = hoy.year
+    mapa = leer_eat_mapa(ws)
 
     lunes = hoy - timedelta(days=hoy.weekday())
-    cerrados = hoy.weekday()  # nº de días ya terminados esta semana (lun..ayer); 0 el lunes
+    cerrados = hoy.weekday()  # días ya terminados esta semana (lun..ayer); 0 el lunes
 
     def eat_de(dia_dt):
-        # solo si el día pertenece al mes/año de la hoja (evita colisión al cruzar mes)
-        if mes_num and (dia_dt.month != mes_num or dia_dt.year != anio):
-            return None
-        return data.get(dia_dt.day)
+        return mapa.get((dia_dt.month, dia_dt.day))
 
     pattern = []
     cumplidos = 0
     for i in range(7):
-        dia_dt = (lunes + timedelta(days=i))
-        if i < cerrados:          # día cerrado (antes de hoy)
+        dia_dt = lunes + timedelta(days=i)
+        if i < cerrados:
             if cumple(eat_de(dia_dt)):
                 pattern.append("ok")
                 cumplidos += 1
             else:
                 pattern.append("fail")
-        elif i == cerrados:       # hoy (en curso)
+        elif i == cerrados:
             pattern.append("today")
-        else:                     # futuro
+        else:
             pattern.append("future")
 
-    # Semana pasada completa (lun-dom), como referencia (útil los lunes).
     last_start = lunes - timedelta(days=7)
     last_cumplidos = 0
     for i in range(7):
-        dia_dt = last_start + timedelta(days=i)
-        if cumple(eat_de(dia_dt)):
+        if cumple(eat_de(last_start + timedelta(days=i))):
             last_cumplidos += 1
 
     res = {
         "generated_at": hoy.isoformat(timespec="seconds"),
         "week_start": lunes.date().isoformat(),
         "dias_cumplidos": cumplidos,
-        "dias_cerrados": cerrados,        # denominador (hasta ayer)
+        "dias_cerrados": cerrados,
         "total_semana": 7,
-        "pattern": pattern,               # 7 estados: ok | fail | today | future
+        "pattern": pattern,
         "last_week": {"cumplidos": last_cumplidos, "total": 7},
     }
 
