@@ -77,12 +77,21 @@ Excel personal en Google Drive (cuenta personal), sincronizado en local:
 /Users/davidrochgarcia/Library/CloudStorage/GoogleDrive-davidrochgarcia@gmail.com/My Drive/1. dOS/Salud/Peso.xlsx
 ```
 
-**Estructura de la hoja de peso:**
-- Fila 1, col A: nombre del mes (ej. "Agosto").
-- Fila 2: cabeceras (`Día`, `Peso`, `Eat`). Datos desde la fila 3.
-- Col A = día del mes · Col B = peso (kg, puede estar vacío) · Col C = "Eat" (marca, hoy ignorada).
+**Estructura de la hoja de peso (¡importante!):**
+- Los meses van en **BLOQUES de 3 columnas, uno al lado del otro** en la misma hoja
+  (`Sheet1`): agosto en A-C, septiembre en D-F, octubre en G-I, y así.
+- **Fila 1** = nombre del mes en la primera columna del bloque (celda combinada de 3):
+  A1="Agosto", D1="Septiembre", …
+- **Fila 2** = cabeceras del bloque (`Día`, `Peso`, `Eat`). Datos desde la **fila 3**.
+- Dentro de cada bloque: 1ª col = día del mes · 2ª = peso (kg, puede estar vacío) ·
+  3ª = "Eat" (`X` = cumplí dieta, `-`/vacío = no).
 - Hay días sin peso (huecos) en medio: se saltan, no se corta el recorrido.
-- La última fila con un número suelto es la media del mes: se ignora.
+- La fila con un número suelto bajo "Peso" (sin día) es la media del mes: se ignora.
+- **El lector une TODOS los bloques en una sola línea temporal continua.** Así, "ayer",
+  "vs. hace 7 días" y la **media semanal** funcionan aunque la semana cruce el cambio de mes
+  (p. ej. lun 31-ago → dom 6-sep mezcla los bloques de agosto y septiembre). Las stats y la
+  gráfica muestran el **mes en curso** (el del último registro). Esto lo arreglamos el 1-sep-2026:
+  antes el lector solo miraba el primer bloque (agosto) y no veía el mes nuevo.
 
 **Excel de entreno** (misma carpeta de Drive):
 
