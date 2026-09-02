@@ -2,32 +2,13 @@ name: Actualizar dashboard (nube)
 
 on:
   schedule:
-    # GitHub usa hora UTC. Cubrimos verano e invierno de Madrid con 4 disparos;
-    # el "portero" de abajo deja pasar solo las 9:00 y las 21:00 hora de Madrid.
-    - cron: "0 7,8,19,20 * * *"
+    # Cada hora (UTC). No importa que GitHub se retrase: si una pasada se salta,
+    # la siguiente lo recoge. Publica SOLO si cambia un dato real.
+    - cron: "0 * * * *"
   workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
 
 jobs:
-  # Portero: decide si esta pasada corresponde a las 9:00 o 21:00 en Madrid.
-  gate:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.check.outputs.run }}
-    steps:
-      - id: check
-        run: |
-          H=$(TZ=Europe/Madrid date +%H)
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$H" = "09" ] || [ "$H" = "21" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Toca ejecutar (hora Madrid: $H)."
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "No toca (hora Madrid: $H). Salgo sin hacer nada."
-          fi
-
   update:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -58,16 +39,12 @@ jobs:
         run: |
           git add data/*.json
           if git diff --cached --quiet -- data/*.json; then
-            echo "Sin cambios, nada que publicar."
-            exit 0
+            echo "Sin cambios, nada que publicar."; exit 0
           fi
-          # ¿El único cambio es la hora (generated_at)? Entonces no publicamos.
           CAMBIOS=$(git diff --cached -U0 -- data/*.json \
             | grep -E '^[+-]' | grep -vE '^[+-]{3}' | grep -v '"generated_at"' | wc -l | tr -d ' ')
           if [ "$CAMBIOS" -eq 0 ]; then
-            echo "Solo cambió la hora; no publico."
-            git reset -- data/*.json
-            exit 0
+            echo "Solo cambió la hora; no publico."; git reset -- data/*.json; exit 0
           fi
           git config user.name "health-dashboard bot"
           git config user.email "actions@users.noreply.github.com"

@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-09-01T11:39:27",
+  "generated_at": "2026-09-02T07:14:14",
   "week_start": "2026-08-31",
-  "dias_activos": 2,
-  "dias_transcurridos": 2,
+  "dias_activos": 3,
+  "dias_transcurridos": 3,
   "total_semana": 7,
-  "slots_marcados": 2,
+  "slots_marcados": 3,
   "pattern": [
     "active",
     "active",
-    "future",
+    "active",
     "future",
     "future",
     "future",
     "future"
   ],
-  "sheet": "Entreno Agosto 2026",
+  "sheet": "Entreno H2 2026",
   "week_col_date": "2026-08-31"
 }
