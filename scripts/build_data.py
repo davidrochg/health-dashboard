@@ -174,6 +174,15 @@ def construir_json(datos: dict) -> dict:
         month_label = f'{datos["anio"]}'.strip()
 
     pesos = [r["weight"] for r in mes_regs]
+
+    # Serie continua de los dos últimos meses (para la tendencia a 2 meses).
+    def _ym(r):
+        d = datetime.strptime(r["date"], "%Y-%m-%d")
+        return (d.year, d.month)
+    meses_pres = sorted({_ym(r) for r in regs if r["date"]})
+    ult2 = set(meses_pres[-2:])
+    series_2m = [r for r in regs if r["date"] and _ym(r) in ult2]
+
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "unit": "kg",
@@ -190,6 +199,7 @@ def construir_json(datos: dict) -> dict:
             "avg": round(sum(pesos) / len(pesos), 1),
         },
         "series": mes_regs,
+        "series_2m": series_2m,
     }
 
 

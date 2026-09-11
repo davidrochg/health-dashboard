@@ -104,6 +104,10 @@
       <div class="chart-head"><div class="h">Tendencia del mes</div><div class="lg" id="range">—</div></div>
       <div id="chart"></div>
     </div>
+    <div class="card">
+      <div class="chart-head"><div class="h">Tendencia · 2 meses</div><div class="lg" id="range2">—</div></div>
+      <div id="chart2"></div>
+    </div>
     <div class="card stats">
       <div class="stat"><div class="k">Mínimo</div><div class="v" id="min">—</div></div>
       <div class="stat"><div class="k">Media</div><div class="v" id="avg">—</div></div>
@@ -165,6 +169,7 @@ function renderPeso(DATA){
   document.getElementById('avg').textContent=DATA.stats.avg.toFixed(1);
   document.getElementById('max').textContent=DATA.stats.max.toFixed(1);
   document.getElementById('range').textContent='días '+DATA.series[0].day+'–'+DATA.series[DATA.series.length-1].day;
+  renderChart2(DATA.series_2m||[]);
   const S=DATA.series,W=440,H=180,padL=30,padR=12,padT=14,padB=24;
   const xs=S.map(p=>p.day),ys=S.map(p=>p.weight);
   const xMin=Math.min(...xs),xMax=Math.max(...xs);
@@ -179,6 +184,31 @@ function renderPeso(DATA){
   let gx='';[xMin,Math.round((xMin+xMax)/2),xMax].forEach(dv=>{gx+=`<text x="${X(dv).toFixed(1)}" y="${H-6}" text-anchor="middle" class="tk">${dv}</text>`;});
   const dots=S.map((p,i)=>{const last=i===S.length-1;return `<circle cx="${X(p.day).toFixed(1)}" cy="${Y(p.weight).toFixed(1)}" r="${last?5:3.2}" class="${last?'dot-last':'dot'}"/>`;}).join('');
   document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs><style>.tk{fill:var(--ink-3);font-size:10px}</style><g class="grid">${gy}</g><g>${gx}</g><path class="area" d="${area}"/><path class="trend" d="${line}"/>${dots}</svg>`;
+}
+
+function renderChart2(S){
+  const el=document.getElementById('chart2');
+  if(!S||S.length<2){el.innerHTML='<div class="err">Aún no hay dos meses de datos</div>';document.getElementById('range2').textContent='';return;}
+  const W=440,H=180,padL=30,padR=12,padT=14,padB=24;
+  const d0=new Date(S[0].date);
+  const t=r=>(new Date(r.date)-d0)/86400000;
+  const tMax=t(S[S.length-1])||1;
+  const ys=S.map(p=>p.weight);
+  let yMin=Math.min(...ys),yMax=Math.max(...ys);
+  const pad=(yMax-yMin)*0.35||1;yMin=Math.floor((yMin-pad)*2)/2;yMax=Math.ceil((yMax+pad)*2)/2;
+  const X=v=>padL+(v/tMax)*(W-padL-padR);
+  const Y=v=>padT+(yMax-v)/((yMax-yMin)||1)*(H-padT-padB);
+  const pts=S.map(p=>[X(t(p)),Y(p.weight)]);
+  const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=line+` L${pts[pts.length-1][0].toFixed(1)} ${H-padB} L${pts[0][0].toFixed(1)} ${H-padB} Z`;
+  let gy='';for(let i=0;i<=2;i++){const v=yMin+(yMax-yMin)*i/2,y=Y(v);gy+=`<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}"/><text x="0" y="${(y+3).toFixed(1)}" class="tk">${v.toFixed(1)}</text>`;}
+  let boundary='',prevM=new Date(S[0].date).getMonth();
+  for(let i=1;i<S.length;i++){const m=new Date(S[i].date).getMonth();if(m!==prevM){const bx=X((t(S[i-1])+t(S[i]))/2);boundary+=`<line x1="${bx.toFixed(1)}" y1="${padT}" x2="${bx.toFixed(1)}" y2="${H-padB}" stroke="var(--line)" stroke-dasharray="3 3"/>`;prevM=m;}}
+  const byMonth={};S.forEach(p=>{const m=new Date(p.date).getMonth();(byMonth[m]=byMonth[m]||[]).push(t(p));});
+  let gx='';Object.keys(byMonth).forEach(m=>{const a=byMonth[m];const mx=X((a[0]+a[a.length-1])/2);gx+=`<text x="${mx.toFixed(1)}" y="${H-6}" text-anchor="middle" class="tk">${MESES[m]}</text>`;});
+  const lp=pts[pts.length-1];
+  document.getElementById('range2').textContent=MESES[new Date(S[0].date).getMonth()]+'–'+MESES[new Date(S[S.length-1].date).getMonth()];
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs><style>.tk{fill:var(--ink-3);font-size:10px}</style><g class="grid">${gy}</g>${boundary}<g>${gx}</g><path d="${area}" fill="url(#g2)"/><path class="trend" d="${line}"/><circle cx="${lp[0].toFixed(1)}" cy="${lp[1].toFixed(1)}" r="5" class="dot-last"/></svg>`;
 }
 
 // ---- DEPORTE ----
