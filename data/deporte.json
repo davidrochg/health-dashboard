@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-09-15T04:07:07",
+  "generated_at": "2026-09-15T09:50:52",
   "week_start": "2026-09-14",
-  "dias_activos": 1,
+  "dias_activos": 2,
   "dias_transcurridos": 2,
   "total_semana": 7,
-  "slots_marcados": 1,
+  "slots_marcados": 2,
   "pattern": [
     "active",
-    "rest",
+    "active",
     "future",
     "future",
     "future",
