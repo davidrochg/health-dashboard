@@ -1,40 +1,40 @@
 {
-  "generated_at": "2026-09-17T01:11:39",
+  "generated_at": "2026-09-17T07:22:55",
   "unit": "kg",
   "month": "Septiembre 2026",
   "current": {
+    "date": "2026-09-17",
+    "day": 17,
+    "weight": 77.8
+  },
+  "previous": {
     "date": "2026-09-16",
     "day": 16,
     "weight": 77.7
   },
-  "previous": {
-    "date": "2026-09-15",
-    "day": 15,
-    "weight": 77.9
-  },
-  "delta_vs_previous": -0.2,
+  "delta_vs_previous": 0.1,
   "delta_vs_week": 0.0,
   "reference_week": {
-    "date": "2026-09-09",
-    "day": 9,
-    "weight": 77.7
+    "date": "2026-09-10",
+    "day": 10,
+    "weight": 77.8
   },
   "week": {
     "this": {
-      "avg": 77.93,
-      "count": 3
+      "avg": 77.9,
+      "count": 4
     },
     "last": {
       "avg": 78.16,
       "count": 7
     },
-    "delta": -0.22,
+    "delta": -0.26,
     "this_start": "2026-09-14",
     "last_start": "2026-09-07",
     "last_end": "2026-09-13"
   },
   "stats": {
-    "count": 16,
+    "count": 17,
     "min": 77.7,
     "max": 78.9,
     "avg": 78.2
@@ -119,6 +119,11 @@
       "date": "2026-09-16",
       "day": 16,
       "weight": 77.7
+    },
+    {
+      "date": "2026-09-17",
+      "day": 17,
+      "weight": 77.8
     }
   ],
   "series_2m": [
@@ -311,6 +316,11 @@
       "date": "2026-09-16",
       "day": 16,
       "weight": 77.7
+    },
+    {
+      "date": "2026-09-17",
+      "day": 17,
+      "weight": 77.8
     }
   ]
 }
