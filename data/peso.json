@@ -1,43 +1,43 @@
 {
-  "generated_at": "2026-09-18T00:05:22",
+  "generated_at": "2026-09-18T10:50:46",
   "unit": "kg",
   "month": "Septiembre 2026",
   "current": {
+    "date": "2026-09-18",
+    "day": 18,
+    "weight": 77.8
+  },
+  "previous": {
     "date": "2026-09-17",
     "day": 17,
     "weight": 77.8
   },
-  "previous": {
-    "date": "2026-09-16",
-    "day": 16,
-    "weight": 77.7
-  },
-  "delta_vs_previous": 0.1,
-  "delta_vs_week": 0.0,
+  "delta_vs_previous": 0.0,
+  "delta_vs_week": -0.4,
   "reference_week": {
-    "date": "2026-09-10",
-    "day": 10,
-    "weight": 77.8
+    "date": "2026-09-11",
+    "day": 11,
+    "weight": 78.2
   },
   "week": {
     "this": {
-      "avg": 77.9,
-      "count": 4
+      "avg": 77.88,
+      "count": 5
     },
     "last": {
       "avg": 78.16,
       "count": 7
     },
-    "delta": -0.26,
+    "delta": -0.28,
     "this_start": "2026-09-14",
     "last_start": "2026-09-07",
     "last_end": "2026-09-13"
   },
   "stats": {
-    "count": 17,
+    "count": 18,
     "min": 77.7,
     "max": 78.9,
-    "avg": 78.2
+    "avg": 78.1
   },
   "series": [
     {
@@ -123,6 +123,11 @@
     {
       "date": "2026-09-17",
       "day": 17,
+      "weight": 77.8
+    },
+    {
+      "date": "2026-09-18",
+      "day": 18,
       "weight": 77.8
     }
   ],
@@ -320,6 +325,11 @@
     {
       "date": "2026-09-17",
       "day": 17,
+      "weight": 77.8
+    },
+    {
+      "date": "2026-09-18",
+      "day": 18,
       "weight": 77.8
     }
   ]
