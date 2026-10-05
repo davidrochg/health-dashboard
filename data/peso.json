@@ -1,36 +1,36 @@
 {
-  "generated_at": "2026-10-05T00:34:03",
+  "generated_at": "2026-10-05T06:39:30",
   "unit": "kg",
   "month": "Octubre 2026",
   "current": {
+    "date": "2026-10-05",
+    "day": 5,
+    "weight": 77.8
+  },
+  "previous": {
     "date": "2026-10-04",
     "day": 4,
     "weight": 77.9
   },
-  "previous": {
-    "date": "2026-10-03",
-    "day": 3,
-    "weight": 77.5
-  },
-  "delta_vs_previous": 0.4,
+  "delta_vs_previous": -0.1,
   "delta_vs_week": null,
   "reference_week": null,
   "week": {
     "this": {
+      "avg": 77.8,
+      "count": 1
+    },
+    "last": {
       "avg": 77.58,
       "count": 4
     },
-    "last": {
-      "avg": 77.75,
-      "count": 6
-    },
-    "delta": -0.17,
-    "this_start": "2026-09-28",
-    "last_start": "2026-09-21",
-    "last_end": "2026-09-27"
+    "delta": 0.22,
+    "this_start": "2026-10-05",
+    "last_start": "2026-09-28",
+    "last_end": "2026-10-04"
   },
   "stats": {
-    "count": 4,
+    "count": 5,
     "min": 77.1,
     "max": 77.9,
     "avg": 77.6
@@ -55,6 +55,11 @@
       "date": "2026-10-04",
       "day": 4,
       "weight": 77.9
+    },
+    {
+      "date": "2026-10-05",
+      "day": 5,
+      "weight": 77.8
     }
   ],
   "series_2m": [
@@ -207,6 +212,11 @@
       "date": "2026-10-04",
       "day": 4,
       "weight": 77.9
+    },
+    {
+      "date": "2026-10-05",
+      "day": 5,
+      "weight": 77.8
     }
   ]
 }
