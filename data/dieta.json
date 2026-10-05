@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-10-04T12:00:39",
-  "week_start": "2026-09-28",
-  "dias_cumplidos": 4,
-  "dias_cerrados": 6,
+  "generated_at": "2026-10-05T00:34:03",
+  "week_start": "2026-10-05",
+  "dias_cumplidos": 0,
+  "dias_cerrados": 0,
   "total_semana": 7,
   "pattern": [
-    "fail",
-    "ok",
-    "ok",
-    "ok",
-    "ok",
-    "fail",
-    "today"
+    "today",
+    "future",
+    "future",
+    "future",
+    "future",
+    "future",
+    "future"
   ],
   "last_week": {
     "cumplidos": 4,
