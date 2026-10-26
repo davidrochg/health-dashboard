@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-10-25T01:01:41",
-  "week_start": "2026-10-19",
-  "dias_activos": 4,
-  "dias_transcurridos": 7,
+  "generated_at": "2026-10-26T03:58:21",
+  "week_start": "2026-10-26",
+  "dias_activos": 0,
+  "dias_transcurridos": 1,
   "total_semana": 7,
-  "slots_marcados": 4,
+  "slots_marcados": 0,
   "pattern": [
-    "active",
-    "active",
-    "active",
-    "active",
     "rest",
-    "rest",
-    "rest"
+    "future",
+    "future",
+    "future",
+    "future",
+    "future",
+    "future"
   ],
   "sheet": "Entreno H2 2026",
-  "week_col_date": "2026-10-19"
+  "week_col_date": "2026-10-22"
 }
