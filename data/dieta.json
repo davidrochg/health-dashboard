@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-26T17:10:24",
+  "generated_at": "2026-10-27T01:53:05",
   "week_start": "2026-10-26",
   "dias_cumplidos": 0,
-  "dias_cerrados": 0,
+  "dias_cerrados": 1,
   "total_semana": 7,
   "pattern": [
+    "fail",
     "today",
-    "future",
     "future",
     "future",
     "future",
